@@ -67,6 +67,16 @@ app.get('/restaurants',(req,res) => {
     })
 })
 
+//find rest wrt to restaurant id
+app.get('/restaurants/:restId',(req,res) => {
+    var restId = parseInt(req.params.restId);
+   
+    db.collection('restaurant').find({"restaurant_id":restId}).toArray((err,result) => {
+        if(err) throw err;
+        res.send(result)
+    })
+})
+
 // restaurant wrt to mealId
 app.get('/filter/:mealId',(req,res) => {
     var id = parseInt(req.params.mealId);
