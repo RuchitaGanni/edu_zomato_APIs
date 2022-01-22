@@ -1,3 +1,4 @@
+var moment =require('moment')
 var express = require('express');
 var app = express();
 var dotenv = require('dotenv');
@@ -8,6 +9,7 @@ var mongoUrl = "mongodb+srv://ruchita:ruchita123@cluster0.2ssc4.mongodb.net/myFi
 var cors = require('cors')
 const bodyParser = require('body-parser')
 var port = process.env.PORT || 8124;
+
 // save the database connection
 var db;
 
@@ -156,9 +158,10 @@ app.put('/updateStatus/:id', (req, res) => {
     res.send('data updated')
 })
 
-// return all the orders
-app.get('/orders', (req, res) => {
-    db.collection('orders').find().toArray((err, result) => {
+// return all the orders against user
+app.get('/orders/:email', (req, res) => {
+    // console.log(req.params.email)
+    db.collection('orders').find({email:req.params.email,orderType:"zomato"}).toArray((err, result) => {
         if (err) throw err;
         res.send(result)
     })
@@ -166,7 +169,11 @@ app.get('/orders', (req, res) => {
 
 app.post('/placeOrder', (req, res) => {
     console.log(req.body);
-    db.collection('orders').insert(req.body, (err, result) => {
+    const now = moment();
+    let aJsDate = JSON.stringify(now.toDate());
+    aJsDate=aJsDate.replace("T"," ").replace("\"","").split(".");
+    req.body['date']=aJsDate[0];
+    db.collection('orders').insertOne(req.body, (err, result) => {
         if (err) throw err;
         res.send("order placed")
     })
